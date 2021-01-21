@@ -20,12 +20,19 @@ pipeline {
     }
     stage('Maven Build'){
         steps{
-            sh "mvn clean package versions:set -DnewVersion=${params.pomVersion}-${BUILD_NUMBER}"
+            sh "mvn clean package versions:set -DnewVersion=${params.pomVersion}-${BUILD_NUMBER}-${params.environment}"
             echo 'Maven Build'
             //archive 'pom.xml'
             //archive 'target/*.jar'
         }
     }
+    
+      stage('Artifact Upload') {
+        steps {
+     sh "mvn clean deploy -PartifactReleaseDeployment"
+     echo 'Nexus server artifact upload'
+        }
+ }
     stage('Cloudhub Deployment'){
           environment {
             ANYPOINT_CREDENTIALS = credentials('anypoint.credentials')
